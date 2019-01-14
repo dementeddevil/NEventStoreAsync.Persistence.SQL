@@ -23,7 +23,7 @@ namespace NEventStore.Persistence.Sql
         {
             _threadKey = typeof(ThreadScope<T>).Name + ":[{0}]".FormatWith(key ?? string.Empty);
 
-            T parent = Load();
+            var parent = Load();
             _rootScope = parent == null;
             _logger.Debug(Messages.OpeningThreadScope, _threadKey, _rootScope);
 

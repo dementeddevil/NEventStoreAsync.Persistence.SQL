@@ -1,10 +1,10 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("NEventStore.Persistence.Sql")]
+[assembly: AssemblyTitle("NEventStoreAsync.Persistence.Sql")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("NEventStore")]
+[assembly: AssemblyProduct("NEventStoreAsync")]
 [assembly: AssemblyCopyright("Copyright © NEventStore Dev Team 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

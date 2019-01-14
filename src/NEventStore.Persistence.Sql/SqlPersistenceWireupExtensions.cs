@@ -31,7 +31,7 @@ namespace NEventStore
         {
 #if !NETSTANDARD2_0
             // init the global seetings if needed
-            int timeout = 0;
+            var timeout = 0;
             if (int.TryParse(System.Configuration.ConfigurationManager.AppSettings["NEventStore.SqlCommand.Timeout"], out timeout))
             {
                 Settings.CommandTimeout = timeout;

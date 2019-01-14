@@ -1,4 +1,6 @@
-﻿using NEventStore.Persistence.Sql.Tests;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using NEventStore.Persistence.Sql.Tests;
 
 namespace NEventStore.Persistence.AcceptanceTests
 {
@@ -27,7 +29,7 @@ namespace NEventStore.Persistence.AcceptanceTests
         private bool _hasherInvoked;
         private IStoreEvents _eventStore;
 
-        protected override void Context()
+        protected override Task Context()
         {
             _eventStore = Wireup
                 .Init()
@@ -49,23 +51,24 @@ namespace NEventStore.Persistence.AcceptanceTests
 #endif
                 .UsingBinarySerialization()
                 .Build();
+            return Task.CompletedTask;
         }
 
-        protected override void Cleanup()
+        protected override async Task Cleanup()
         {
             if (_eventStore != null)
             {
-                _eventStore.Advanced.Drop();
+                await _eventStore.Advanced.DropAsync(CancellationToken.None);
                 _eventStore.Dispose();
             }
         }
 
-        protected override void Because()
+        protected override async Task Because()
         {
-            using (var stream = _eventStore.OpenStream(Guid.NewGuid()))
+            using (var stream = await _eventStore.OpenStreamAsync(Guid.NewGuid(), CancellationToken.None))
             {
                 stream.Add(new EventMessage{ Body = "Message" });
-                stream.CommitChanges(Guid.NewGuid());
+                await stream.CommitChangesAsync(Guid.NewGuid(), CancellationToken.None);
             }
         }
 

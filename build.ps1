@@ -15,7 +15,7 @@ choco install nuget.commandline
 choco upgrade nuget.commandline
 
 # Display minimal restore information
-dotnet restore ./src/NEventStore.Persistence.Sql.Core.sln --verbosity m
+dotnet restore ./src/NEventStoreAsync.Persistence.Sql.Core.sln --verbosity m
 
 # GitVersion (for the main module)
 Write-Host "Running GitVersion for the Project"
@@ -29,12 +29,12 @@ gitversion ".\dependencies\NEventStore" /updateAssemblyInfo | Out-Null
 
 # Build
 Write-Host "Building: "$nugetversion" "$configuration
-dotnet build ./src/NEventStore.Persistence.Sql.Core.sln -c $configuration --no-restore
+dotnet build ./src/NEventStoreAsync.Persistence.Sql.Core.sln -c $configuration --no-restore
 
 # Testing
 if ($runtests -eq "y") {
     Write-Host "Executing Tests"
-    dotnet test ./src/NEventStore.Persistence.Sql.Core.sln -c $configuration --no-build
+    dotnet test ./src/NEventStoreAsync.Persistence.Sql.Core.sln -c $configuration --no-build
     Write-Host "Tests Execution Complated"
 }
 
@@ -48,4 +48,4 @@ Write-Host "NuGet Packages creation"
 #dotnet pack ./src/NEventStore.Persistence.Sql/NEventStore.Persistence.Sql.Core.csproj --no-build -c $configuration -o $artifacts -p:NuspecFile="" -p:NuspecProperties="pippo=$configuration;version=$nugetversion"
 
 #Write-Host nuget pack ./src/.nuget/NEventStore.Persistence.Sql.nuspec -properties "version=$nugetversion;configuration=$configuration"
-nuget pack ./src/.nuget/NEventStore.Persistence.Sql.nuspec -properties "version=$nugetversion;configuration=$configuration" -OutputDirectory $nugetartifacts
+nuget pack ./src/.nuget/NEventStoreAsync.Persistence.Sql.nuspec -properties "version=$nugetversion;configuration=$configuration" -OutputDirectory $nugetartifacts

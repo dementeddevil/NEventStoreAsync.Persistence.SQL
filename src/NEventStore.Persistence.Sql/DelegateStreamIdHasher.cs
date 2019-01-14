@@ -8,11 +8,7 @@ namespace NEventStore.Persistence.Sql
 
         public DelegateStreamIdHasher(Func<string, string> getHash)
         {
-            if (getHash == null)
-            {
-                throw new ArgumentNullException("getHash");
-            }
-            _getHash = getHash;
+            _getHash = getHash ?? throw new ArgumentNullException(nameof(getHash));
         }
 
         public string GetHash(string streamId)

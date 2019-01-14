@@ -59,7 +59,7 @@ namespace NEventStore.Persistence.Sql
 #if !NETSTANDARD2_0
         protected static ISqlDialect ResolveDialect(ConnectionStringSettings settings)
         {
-            string providerName = settings.ProviderName.ToUpperInvariant();
+            var providerName = settings.ProviderName.ToUpperInvariant();
 
             if (providerName.Contains("MYSQL"))
             {

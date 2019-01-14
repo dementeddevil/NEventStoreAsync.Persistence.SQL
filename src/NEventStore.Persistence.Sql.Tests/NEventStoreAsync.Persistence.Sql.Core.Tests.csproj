@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AssemblyName>NEventStoreAsync.Persistence.Sql.Tests</AssemblyName>
+    <RootNamespace>NEventStore.Persistence.Sql.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="packages.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\dependencies\NEventStore\src\NEventStore\NEventStoreAsync.Core.csproj" />
+    <ProjectReference Include="..\NEventStore.Persistence.Sql\NEventStoreAsync.Persistence.Sql.Core.csproj" />
+  </ItemGroup>
+
+</Project>

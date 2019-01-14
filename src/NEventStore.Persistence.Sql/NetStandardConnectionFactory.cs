@@ -36,8 +36,8 @@ namespace NEventStore.Persistence.Sql
 
         protected virtual IDbConnection OpenConnection(string connectionString)
         {
-            DbProviderFactory factory = _providerFactory;
-            DbConnection connection = factory.CreateConnection();
+            var factory = _providerFactory;
+            var connection = factory.CreateConnection();
             if (connection == null)
             {
                 throw new ConfigurationErrorsException(Messages.BadConnectionName);

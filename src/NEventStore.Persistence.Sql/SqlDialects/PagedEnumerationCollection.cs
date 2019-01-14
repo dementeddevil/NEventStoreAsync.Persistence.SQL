@@ -94,10 +94,7 @@ namespace NEventStore.Persistence.Sql.SqlDialects
             }
         }
 
-        object IEnumerator.Current
-        {
-            get { return ((IEnumerator<IDataRecord>) this).Current; }
-        }
+        object IEnumerator.Current => ((IEnumerator<IDataRecord>) this).Current;
 
         protected virtual void Dispose(bool disposing)
         {

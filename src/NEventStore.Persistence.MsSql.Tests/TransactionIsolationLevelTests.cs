@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Transactions;
 using FluentAssertions;
 #if !NETSTANDARD2_0
@@ -33,7 +35,7 @@ namespace NEventStore.Persistence.AcceptanceTests
     public class when_reusing_a_connection_from_the_connection_pool_without_a_transaction_scope :
         IsolationLevelConcern
     {
-        protected override void Because()
+        protected override async Task Because()
         {
             using (var conn = ConnectionFactory.Open())
             using (conn.BeginTransaction(IsolationLevel.RepeatableRead))
@@ -42,7 +44,7 @@ namespace NEventStore.Persistence.AcceptanceTests
 
             Recorder.IsRecording = true;
             // Enumerate fully to make sure the underlying DB stuff (command/reader etc.) is disposed
-            var commits = Persistence.GetFrom().ToArray();
+            var commits = (await Persistence.GetFromAsync(0, CancellationToken.None)).ToArray();
             Recorder.IsRecording = false;
         }
 
@@ -73,9 +75,10 @@ namespace NEventStore.Persistence.AcceptanceTests
             get { return _fixture.ConnectionFactory; }
         }
 
-        protected override void Cleanup()
+        protected override Task Cleanup()
         {
             _fixture.Dispose();
+            return Task.CompletedTask;
         }
 
         public void Dispose()
@@ -138,7 +141,7 @@ namespace NEventStore.Persistence.AcceptanceTests
         {
             if (_persistence != null && !_persistence.IsDisposed)
             {
-                _persistence.Drop();
+                _persistence.DropAsync(CancellationToken.None).GetAwaiter().GetResult();
                 _persistence.Dispose();
             }
 #if !NETSTANDARD2_0
@@ -146,7 +149,7 @@ namespace NEventStore.Persistence.AcceptanceTests
 #else
             _persistence = _createPersistence();
 #endif
-            _persistence.Initialize();
+            _persistence.InitializeAsync(CancellationToken.None).GetAwaiter().GetResult();
         }
 
         public IPersistStreams Persistence
@@ -168,7 +171,7 @@ namespace NEventStore.Persistence.AcceptanceTests
         {
             if (_persistence != null && !_persistence.IsDisposed)
             {
-                _persistence.Drop();
+                _persistence.DropAsync(CancellationToken.None).GetAwaiter().GetResult();
                 _persistence.Dispose();
             }
         }
@@ -226,7 +229,7 @@ namespace NEventStore.Persistence.AcceptanceTests
             private readonly IDbStatement _innerStatement;
             private readonly IsolationLevelRecorder _recorder;
 
-            public List<StatementAndIsolationLevel> StatementsWithIsolationLevels { get; private set; }
+            public List<StatementAndIsolationLevel> StatementsWithIsolationLevels { get; }
 
             public TransactionLevelRecordingStatement(IDbStatement innerStatement, IsolationLevelRecorder recorder)
             {
@@ -242,9 +245,8 @@ namespace NEventStore.Persistence.AcceptanceTests
 
             private IsolationLevel GetCurrentIsolationLevel()
             {
-                return
-                    (IsolationLevel)
-                        _innerStatement.ExecuteScalar(
+                return _innerStatement
+                    .ExecuteScalarAsync<IsolationLevel>(
                             string.Format(@"
 SELECT CASE transaction_isolation_level 
   WHEN 0 THEN {0}
@@ -261,7 +263,9 @@ where session_id = @@SPID",
                                 (int) IsolationLevel.ReadCommitted,
                                 (int) IsolationLevel.RepeatableRead,
                                 (int) IsolationLevel.Serializable,
-                                (int) IsolationLevel.Snapshot));
+                                (int) IsolationLevel.Snapshot),
+                            CancellationToken.None)
+                    .GetAwaiter().GetResult();
             }
 
             public void AddParameter(string name, object value, DbType? parameterType = null)
@@ -269,34 +273,34 @@ where session_id = @@SPID",
                 _innerStatement.AddParameter(name, value, parameterType);
             }
 
-            public int ExecuteNonQuery(string commandText)
+            public Task<int> ExecuteNonQueryAsync(string commandText, CancellationToken cancellationToken)
             {
                 _recorder.RecordIsolationLevel(commandText, GetCurrentIsolationLevel());
-                return _innerStatement.ExecuteNonQuery(commandText);
+                return _innerStatement.ExecuteNonQueryAsync(commandText, cancellationToken);
             }
 
-            public int ExecuteWithoutExceptions(string commandText)
+            public Task<int> ExecuteWithoutExceptionsAsync(string commandText, CancellationToken cancellationToken)
             {
                 _recorder.RecordIsolationLevel(commandText, GetCurrentIsolationLevel());
-                return _innerStatement.ExecuteWithoutExceptions(commandText);
+                return _innerStatement.ExecuteWithoutExceptionsAsync(commandText, cancellationToken);
             }
 
-            public object ExecuteScalar(string commandText)
+            public Task<T> ExecuteScalarAsync<T>(string commandText, CancellationToken cancellationToken)
             {
                 _recorder.RecordIsolationLevel(commandText, GetCurrentIsolationLevel());
-                return _innerStatement.ExecuteScalar(commandText);
+                return _innerStatement.ExecuteScalarAsync<T>(commandText, cancellationToken);
             }
 
-            public IEnumerable<IDataRecord> ExecuteWithQuery(string queryText)
+            public Task<IEnumerable<IDataRecord>> ExecuteWithQueryAsync(string queryText, CancellationToken cancellationToken)
             {
                 _recorder.RecordIsolationLevel(queryText, GetCurrentIsolationLevel());
-                return _innerStatement.ExecuteWithQuery(queryText);
+                return _innerStatement.ExecuteWithQueryAsync(queryText, cancellationToken);
             }
 
-            public IEnumerable<IDataRecord> ExecutePagedQuery(string queryText, NextPageDelegate nextpage)
+            public Task<IEnumerable<IDataRecord>> ExecutePagedQueryAsync(string queryText, NextPageDelegate nextpage, CancellationToken cancellationToken)
             {
                 _recorder.RecordIsolationLevel(queryText, GetCurrentIsolationLevel());
-                return _innerStatement.ExecutePagedQuery(queryText, nextpage);
+                return _innerStatement.ExecutePagedQueryAsync(queryText, nextpage, cancellationToken);
             }
 
             public int PageSize

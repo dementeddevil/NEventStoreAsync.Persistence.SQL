@@ -1,9 +1,12 @@
+
 namespace NEventStore.Persistence.Sql.SqlDialects
 {
     using System;
     using System.Collections.Generic;
     using System.Data;
     using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
     using System.Transactions;
     using NEventStore.Persistence.Sql;
 
@@ -19,9 +22,17 @@ namespace NEventStore.Persistence.Sql.SqlDialects
             : base(dialect, scope, connection, transaction)
         {}
 
-        public override int ExecuteNonQuery(string commandText)
+        public override async Task<int> ExecuteNonQueryAsync(string commandText, CancellationToken cancellationToken)
         {
-            return SplitCommandText(commandText).Sum(x => base.ExecuteNonQuery(x));
+            var rowsAffected = 0;
+            foreach (var command in SplitCommandText(commandText))
+            {
+                rowsAffected += await base
+                    .ExecuteNonQueryAsync(command, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+
+            return rowsAffected;
         }
 
         private static IEnumerable<string> SplitCommandText(string delimited)
