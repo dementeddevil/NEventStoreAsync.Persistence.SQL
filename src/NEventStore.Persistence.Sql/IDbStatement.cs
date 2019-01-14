@@ -21,6 +21,6 @@ namespace NEventStore.Persistence.Sql
 
         Task<IEnumerable<IDataRecord>> ExecuteWithQueryAsync(string queryText, CancellationToken cancellationToken);
 
-        Task<IEnumerable<IDataRecord>> ExecutePagedQueryAsync(string queryText, NextPageDelegate nextpage, CancellationToken cancellationToken);
+        Task<IEnumerable<IDataRecord>> ExecutePagedQueryAsync(string queryText, NextPageDelegate nextPage, CancellationToken cancellationToken);
     }
 }

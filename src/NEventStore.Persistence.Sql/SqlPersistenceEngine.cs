@@ -146,7 +146,8 @@ namespace NEventStore.Persistence.Sql
             ICommit commit;
             try
             {
-                commit = await PersistCommitAsync(attempt, cancellationToken).ConfigureAwait(false);
+                commit = await PersistCommitAsync(attempt, cancellationToken)
+                    .ConfigureAwait(false);
                 Logger.Debug(Messages.CommitPersisted, attempt.CommitId);
             }
             catch (Exception e)
@@ -156,7 +157,8 @@ namespace NEventStore.Persistence.Sql
                     throw;
                 }
 
-                if (await DetectDuplicateAsync(attempt, cancellationToken).ConfigureAwait(false))
+                if (await DetectDuplicateAsync(attempt, cancellationToken)
+                    .ConfigureAwait(false))
                 {
                     Logger.Info(Messages.DuplicateCommit);
                     throw new DuplicateCommitException(e.Message, e);
@@ -385,7 +387,8 @@ namespace NEventStore.Persistence.Sql
                 statement.PageSize = _pageSize;
 
                 Logger.Verbose(Messages.ExecutingQuery);
-                return await query(statement, cancellationToken).ConfigureAwait(false);
+                return await query(statement, cancellationToken)
+                    .ConfigureAwait(true);
             }
             catch (Exception e)
             {
@@ -406,7 +409,8 @@ namespace NEventStore.Persistence.Sql
 
         protected virtual TransactionScope OpenQueryScope()
         {
-            return OpenCommandScope() ?? new TransactionScope(TransactionScopeOption.Suppress);
+            return OpenCommandScope() ??
+                   new TransactionScope(TransactionScopeOption.Suppress);
         }
 
         private void ThrowWhenDisposed()
@@ -437,7 +441,8 @@ namespace NEventStore.Persistence.Sql
                 try
                 {
                     Logger.Verbose(Messages.ExecutingCommand);
-                    var rowsAffected = await command(connection, statement, cancellationToken).ConfigureAwait(false);
+                    var rowsAffected = await command(connection, statement, cancellationToken)
+                        .ConfigureAwait(true);
                     Logger.Verbose(Messages.CommandExecuted, rowsAffected);
 
                     transaction?.Commit();
@@ -465,10 +470,12 @@ namespace NEventStore.Persistence.Sql
         {
             if (Transaction.Current == null)
             {
-                return new TransactionScope(_scopeOption, new TransactionOptions
-                {
-                    IsolationLevel = System.Transactions.IsolationLevel.ReadCommitted
-                });
+                return new TransactionScope(
+                    _scopeOption,
+                    new TransactionOptions
+                    {
+                        IsolationLevel = System.Transactions.IsolationLevel.ReadCommitted
+                    });
             }
             // todo: maybe add a warning for the isolation level
             /*

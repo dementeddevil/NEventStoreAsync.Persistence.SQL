@@ -34,7 +34,7 @@ namespace NEventStore.Persistence.Sql.SqlDialects
             _transaction = transaction;
         }
 
-        protected IDictionary<string, Tuple<object, DbType?>> Parameters { get; private set; }
+        protected IDictionary<string, Tuple<object, DbType?>> Parameters { get; }
 
         protected ISqlDialect Dialect => _dialect;
 
@@ -98,7 +98,8 @@ namespace NEventStore.Persistence.Sql.SqlDialects
                 {
                     if (command is DbCommand asyncCommand)
                     {
-                        return (T)(await asyncCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false));
+                        return (T)(await asyncCommand.ExecuteScalarAsync(cancellationToken)
+                            .ConfigureAwait(false));
                     }
 
                     return (T)command.ExecuteScalar();
@@ -115,12 +116,16 @@ namespace NEventStore.Persistence.Sql.SqlDialects
             }
         }
 
-        public virtual Task<IEnumerable<IDataRecord>> ExecuteWithQueryAsync(string queryText, CancellationToken cancellationToken)
+        public virtual Task<IEnumerable<IDataRecord>> ExecuteWithQueryAsync(
+            string queryText, CancellationToken cancellationToken)
         {
             return ExecuteQueryAsync(queryText, (query, latest) => { }, InfinitePageSize, cancellationToken);
         }
 
-        public virtual Task<IEnumerable<IDataRecord>> ExecutePagedQueryAsync(string queryText, NextPageDelegate nextpage, CancellationToken cancellationToken)
+        public virtual Task<IEnumerable<IDataRecord>> ExecutePagedQueryAsync(
+            string queryText,
+            NextPageDelegate nextPage,
+            CancellationToken cancellationToken)
         {
             var pageSize = Dialect.CanPage ? PageSize : InfinitePageSize;
             if (pageSize > 0)
@@ -129,7 +134,7 @@ namespace NEventStore.Persistence.Sql.SqlDialects
                 Parameters.Add(Dialect.Limit, Tuple.Create((object)pageSize, (DbType?)null));
             }
 
-            return ExecuteQueryAsync(queryText, nextpage, pageSize, cancellationToken);
+            return ExecuteQueryAsync(queryText, nextPage, pageSize, cancellationToken);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -152,7 +157,11 @@ namespace NEventStore.Persistence.Sql.SqlDialects
             }
         }
 
-        protected virtual Task<IEnumerable<IDataRecord>> ExecuteQueryAsync(string queryText, NextPageDelegate nextpage, int pageSize, CancellationToken cancellationToken)
+        protected virtual Task<IEnumerable<IDataRecord>> ExecuteQueryAsync(
+            string queryText,
+            NextPageDelegate nextPage,
+            int pageSize,
+            CancellationToken cancellationToken)
         {
             Parameters.Add(Dialect.Skip, Tuple.Create((object)0, (DbType?)null));
             var command = BuildCommand(queryText);
@@ -160,7 +169,7 @@ namespace NEventStore.Persistence.Sql.SqlDialects
             try
             {
                 return Task.FromResult<IEnumerable<IDataRecord>>(
-                    new PagedEnumerationCollection(_scope, Dialect, command, nextpage, pageSize, this));
+                    new PagedEnumerationCollection(_scope, Dialect, command, nextPage, pageSize, this));
             }
             catch (Exception)
             {

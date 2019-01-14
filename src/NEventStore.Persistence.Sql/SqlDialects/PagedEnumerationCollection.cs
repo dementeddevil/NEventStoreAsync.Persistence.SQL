@@ -14,7 +14,7 @@ namespace NEventStore.Persistence.Sql.SqlDialects
         private readonly IDbCommand _command;
         private readonly ISqlDialect _dialect;
         private readonly IEnumerable<IDisposable> _disposable = new IDisposable[] {};
-        private readonly NextPageDelegate _nextpage;
+        private readonly NextPageDelegate _nextPage;
         private readonly int _pageSize;
         private readonly TransactionScope _scope;
 
@@ -27,14 +27,14 @@ namespace NEventStore.Persistence.Sql.SqlDialects
             TransactionScope scope,
             ISqlDialect dialect,
             IDbCommand command,
-            NextPageDelegate nextpage,
+            NextPageDelegate nextPage,
             int pageSize,
             params IDisposable[] disposable)
         {
             _scope = scope;
             _dialect = dialect;
             _command = command;
-            _nextpage = nextpage;
+            _nextPage = nextPage;
             _pageSize = pageSize;
             _disposable = disposable ?? _disposable;
         }
@@ -137,7 +137,7 @@ namespace NEventStore.Persistence.Sql.SqlDialects
             if (_pageSize > 0 && _position >= _pageSize)
             {
                 _command.SetParameter(_dialect.Skip, _position);
-                _nextpage(_command, _current);
+                _nextPage(_command, _current);
             }
 
             _reader = _reader ?? OpenNextPage();

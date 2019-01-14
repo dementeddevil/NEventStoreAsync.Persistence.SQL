@@ -297,10 +297,10 @@ where session_id = @@SPID",
                 return _innerStatement.ExecuteWithQueryAsync(queryText, cancellationToken);
             }
 
-            public Task<IEnumerable<IDataRecord>> ExecutePagedQueryAsync(string queryText, NextPageDelegate nextpage, CancellationToken cancellationToken)
+            public Task<IEnumerable<IDataRecord>> ExecutePagedQueryAsync(string queryText, NextPageDelegate nextPage, CancellationToken cancellationToken)
             {
                 _recorder.RecordIsolationLevel(queryText, GetCurrentIsolationLevel());
-                return _innerStatement.ExecutePagedQueryAsync(queryText, nextpage, cancellationToken);
+                return _innerStatement.ExecutePagedQueryAsync(queryText, nextPage, cancellationToken);
             }
 
             public int PageSize
