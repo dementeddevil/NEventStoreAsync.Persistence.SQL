@@ -47,6 +47,8 @@
 
   <ItemGroup>
     <Compile Include="..\..\dependencies\NEventStore\src\NEventStore.Persistence.AcceptanceTests\PersistenceTests.cs" Link="PersistenceTests.cs" />
+    <Compile Include="..\GlobalAssemblyInfo.cs" Link="Properties\GlobalAssemblyInfo.cs" />
+    <Compile Include="..\VersionAssemblyInfo.cs" Link="Properties\VersionAssemblyInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>
