@@ -21,7 +21,7 @@ dotnet restore ./src/NEventStoreAsync.Persistence.Sql.Core.sln --verbosity m
 
 # GitVersion (for the main module)
 Write-Host "Running GitVersion for the Project"
-$str = gitversion /updateAssemblyInfo | out-string
+$str = gitversion /updateAssemblyInfo ./src/VersionAssemblyInfo.cs | out-string
 $json = convertFrom-json $str
 $nugetversion = $json.NuGetVersion
 
