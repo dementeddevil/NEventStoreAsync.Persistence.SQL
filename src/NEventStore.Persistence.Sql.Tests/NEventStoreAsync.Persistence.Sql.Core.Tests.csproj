@@ -12,6 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs" Link="Properties\GlobalAssemblyInfo.cs" />
+    <Compile Include="..\VersionAssemblyInfo.cs" Link="Properties\VersionAssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\dependencies\NEventStore\src\NEventStore\NEventStoreAsync.Core.csproj" />
     <ProjectReference Include="..\NEventStore.Persistence.Sql\NEventStoreAsync.Persistence.Sql.Core.csproj" />
   </ItemGroup>
