@@ -7,6 +7,20 @@
     <RootNamespace>NEventStore.Persistence.Sql</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageId>NEventStoreAsync.Persistence.Sql</PackageId>
+    <Title>NEventStoreAsync.Persistence.Sql</Title>
+    <Authors>NEventStore Dev Team;Adrian Lewis</Authors>
+    <PackageProjectUrl>https://github.com/dementeddevil/NEventStoreAsync.Persistence.Sql</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/dementeddevil/NEventStoreAsync.Persistence.Sql.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Description>Async capable persistence store for NEventStoreAsync.</Description>
+    <PackageTags>events, event sourcing, cqrs, storage, persistence, database</PackageTags>
+    <PackageReleaseNotes>Please check the release notes on github.</PackageReleaseNotes>
+    <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <DefineConstants Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">TRACE;DEBUG;NETSTANDARD2_0</DefineConstants>
     <DefineConstants Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">NETSTANDARD2_0</DefineConstants>
